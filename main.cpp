@@ -15,44 +15,57 @@
 void ImprimeGato(int*** jugador);
 int*** IngresaGato(int*** jugador, int turno, int solitario);
 int ChecaFin(int*** jugador);
+class Juego {
+private:
+    int fin = 0, turno = 0, i, j;
+    int*** jugador = (int***) malloc(2*sizeof(int**));
+public:
+    Juego() {
+        for (i = 0; i < 2; i++)
+        {
+            jugador[i] = (int**) malloc(3*sizeof(int*));
+            for (j = 0; j < 3; j++)
+            {
+                jugador[i][j] = (int*) malloc(3*sizeof(int));
+            }
+        }
+        for (i = 0; i < 3; i++)
+        {
+            for (j = 0; j < 3; j++)
+            {
+                jugador[0][i][j] = 0;
+                jugador[1][i][j] = 0;
+            }
+        }
+    };
+    void acompletate() {
+        do
+        {
+            fin = ChecaFin(jugador);
+            ImprimeGato(jugador);
+            if(!fin)
+            {
+                jugador = IngresaGato(jugador, turno, 0);
+                turno = !turno;
+            }
+        } while (!fin);
+    }
+    int quienGano() {
+        return fin;
+    }
+};
+
+void titulo();
+
 int main()
 {
     system("cls");
-    printf(" ____              _____    ____\n");
-    printf("/    %c      /%c       |     /    %c\n", 92, 92, 92);
-    printf("|   _      /__%c      |     |    |\n", 92);
-    printf("|    %c    /    %c     |     |    |\n", 92, 92);
-    printf("%c____/   /      %c    |     %c____/\n\n\n", 92, 92, 92);
-    int select = 1, fin = 0, turno = 0, valor = 1, i, j, k;
-    int*** jugador = (int***) malloc(2*sizeof(int**));
-    for (i = 0; i < 2; i++)
-    {
-        jugador[i] = (int**) malloc(3*sizeof(int*));
-        for (j = 0; j < 3; j++)
-        {
-            jugador[i][j] = (int*) malloc(3*sizeof(int));
-        }
-    }
-    for (i = 0; i < 3; i++)
-    {
-        for (j = 0; j < 3; j++)
-        {
-            jugador[0][i][j] = 0;
-            jugador[1][i][j] = 0;
-        }
-    }
-
-    do
-    {
-        fin = ChecaFin(jugador);
-        ImprimeGato(jugador);
-        if(!fin)
-        {
-            jugador = IngresaGato(jugador, turno, 0);
-            turno = !turno;
-        }
-    } while (!fin);
-    if (fin != 3) printf("\nHa ganado el jugador %d.", fin);
+    titulo();
+    Juego juego;
+    juego.acompletate();
+    int ganador = juego.quienGano();
+    // anuncia el ganador
+    if (ganador != 3) printf("\nHa ganado el jugador %d.", ganador);
     else printf("\nEmpate.");
     return 0;
 }
@@ -64,6 +77,13 @@ int main()
 //                                                                                                            //
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+void titulo() {
+    printf(" ____              _____    ____\n");
+    printf("/    %c      /%c       |     /    %c\n", 92, 92, 92);
+    printf("|   _      /__%c      |     |    |\n", 92);
+    printf("|    %c    /    %c     |     |    |\n", 92, 92);
+    printf("%c____/   /      %c    |     %c____/\n\n\n", 92, 92, 92);
+}
 
 void ImprimeGato(int*** jugador)
 {
