@@ -41,156 +41,19 @@ int main()
             jugador[1][i][j] = 0;
         }
     }
+
     do
     {
-        if (select != 0 && select != 1 && select != 2) printf("Valor inv%clido.\n\n", 160);
-        printf("Para jugar solo, ingresa 1.\nPara multijugador, ingresa 2.\nPara terminar, ingresa 0.\n\nIngresa el valor: ");
-        scanf("%d", &select);
-        if (select == 1)
+        fin = ChecaFin(jugador);
+        ImprimeGato(jugador);
+        if(!fin)
         {
-            int esnpc;
-            printf("\n\nQui%cn empieza?\nT%c: Ingresa 1.\nLa computadora: Ingresa 2.\nIngresa valor: ", 130, 163);
-            do
-            {
-                scanf("%d", &esnpc);
-            } while (esnpc != 1 && esnpc != 2);
-            esnpc--;
-            printf("\n\n");
-            do
-            {
-                fin = ChecaFin(jugador);
-                ImprimeGato(jugador);
-                if (!fin && esnpc == turno)
-                {
-                    jugador = IngresaGato(jugador, turno, 1);
-                }
-                else if(!fin)
-                {
-                    printf("\nTurno de la computadora en: "); Sleep(500);
-                    printf("3... "); Sleep(500);
-                    printf("2... "); Sleep(500);
-                    printf("1...\n\n"); Sleep(500);
-                    int ver1, ver0, hor1, hor0, diag1_1, diag1_0, diag2_1, diag2_0;
-                    int siguiente = 0;
-                    for (i = 0; i < 3; i++) //Ganar
-                    {
-                        for (j = 0, ver1 = 0, ver0 = 0, hor1 = 0, hor0 = 0, diag1_1 = 0, diag1_0 = 0, diag2_1 = 0, diag2_0 = 0; j < 3; j++)
-                        {
-                            if (jugador[turno][i][j] == 1) {ver1++;}
-                            if (jugador[1][i][j] == 0 && jugador[0][i][j] == 0) {ver0 = j + 1;}
-                            if (jugador[turno][j][i] == 1) {hor1++;}
-                            if (jugador[1][j][i] == 0 && jugador[0][j][i] == 0) {hor0 = j + 1;}
-                            if (jugador[turno][j][j] == 1) {diag1_1++;}
-                            if (jugador[1][j][j] == 0 && jugador[0][j][j] == 0) {diag1_0 = j + 1;}
-                            if (jugador[turno][j][2-j] == 1) {diag2_1++;}
-                            if (jugador[1][j][2-j] == 0 && jugador[0][j][2-j] == 0) {diag2_0 = j + 1;}
-                        }
-                        if (ver1 == 2 && !siguiente && ver0) {jugador[turno][i][ver0-1] = 1; siguiente = 1; printf("horNPC");}
-                        if (hor1 == 2 && !siguiente && hor0) {jugador[turno][hor0-1][i] = 1; siguiente = 1; printf("verNPC");}
-                        if (diag1_1 == 2 && !siguiente && diag1_0) {jugador[turno][diag1_0-1][diag1_0-1] = 1; siguiente = 1; printf("diag1NPC");}
-                        if (diag2_1 == 2 && !siguiente && diag2_0) {jugador[turno][diag2_0-1][1-diag2_0] = 1; siguiente = 1; printf("diag2NPC");}
-                    }
-                    for (i = 0; i < 3; i++) //Blockear
-                    {
-                        for (j = 0, ver1 = 0, ver0 = 0, hor1 = 0, hor0 = 0, diag1_1 = 0, diag1_0 = 0, diag2_1 = 0, diag2_0 = 0; j < 3; j++)
-                        {
-                            if (jugador[!turno][i][j] == 1) {ver1++;}
-                            if (jugador[1][i][j] == 0 && jugador[0][i][j] == 0) {ver0 = j+1;}
-                            if (jugador[!turno][j][i] == 1) {hor1++;}
-                            if (jugador[1][j][i] == 0 && jugador[0][j][i] == 0) {hor0 = j+1;}
-                            if (jugador[!turno][j][j] == 1) {diag1_1++;}
-                            if (jugador[1][j][j] == 0 && jugador[0][j][j] == 0) {diag1_0 = j+1;}
-                            if (jugador[!turno][j][2-j] == 1) {diag2_1++;}
-                            if (jugador[1][j][2-j] == 0 && jugador[0][j][2-j] == 0) {diag2_0 = j+1;}
-                        }
-                        if (ver1 == 2 && !siguiente && ver0) {jugador[turno][i][ver0-1] = 1; siguiente = 1;}
-                        if (hor1 == 2 && !siguiente && hor0) {jugador[turno][hor0-1][i] = 1; siguiente = 1;}
-                        if (diag1_1 == 2 && !siguiente && diag1_0) {jugador[turno][diag1_0-1][diag1_0-1] = 1; siguiente = 1;}
-                        if (diag2_1 == 2 && !siguiente && diag2_0) {jugador[turno][diag2_0-1][3-diag2_0] = 1; siguiente = 1;}
-                    }
-                    if (esnpc == 1) //Primer turno
-                    {
-                        for (i = 0, valor = 1; i < 3; i++)
-                        {
-                            for (j = 0; j < 3; j++)
-                            {
-                                if (jugador[0][i][j] == 1 || jugador[1][i][j] == 1) {valor = 2;}
-                            }
-                        }
-                        if (valor == 1 && !siguiente) {jugador[turno][0][0] = 1; siguiente = 1;}
-                    }
-                    if ((jugador[!turno][0][0] == 1 && jugador[!turno][2][2] == 1) || (jugador[!turno][0][2] == 1 && jugador[!turno][2][0] == 1)) //Estrategia para extremos opuestos.
-                    {
-                        if (!jugador[0][1][0] && !jugador[1][1][0] && !siguiente) {jugador[turno][1][0] = 1; siguiente = 1;}
-                        if (!jugador[0][0][1] && !jugador[1][0][1] && !siguiente) {jugador[turno][0][1] = 1; siguiente = 1;}
-                        if (!jugador[0][2][1] && !jugador[1][2][1] && !siguiente) {jugador[turno][2][1] = 1; siguiente = 1;}
-                        if (!jugador[0][1][2] && !jugador[1][1][2] && !siguiente) {jugador[turno][1][2] = 1; siguiente = 1;}
-                    }
-                    if (jugador[!turno][0][1] && jugador[!turno][1][0] && !jugador[turno][0][0] && !siguiente) {jugador[turno][0][0] = 1; siguiente = 1;}/////////
-                    if (jugador[!turno][0][1] && jugador[!turno][1][2] && !jugador[turno][0][2] && !siguiente) {jugador[turno][0][2] = 1; siguiente = 1;}//Para la estrategia
-                    if (jugador[!turno][1][0] && jugador[!turno][2][1] && !jugador[turno][2][0] && !siguiente) {jugador[turno][2][0] = 1; siguiente = 1;}//de Mike
-                    if (jugador[!turno][1][2] && jugador[!turno][2][1] && !jugador[turno][2][2] && !siguiente) {jugador[turno][2][2] = 1; siguiente = 1;}/////////
-                    if (jugador[0][1][1] == 0 && jugador[1][1][1] == 0 && !siguiente) {jugador[turno][1][1] = 1; siguiente = 1;} //Centro
-                    for (i = 0; i < 3; i++) //Simetría
-                    {
-                        for (j = 0; j < 3; j++)
-                        {
-                            if ((jugador[0][i][j] == 1 || jugador[1][i][j] == 1) && jugador[0][2-i][2-j] == 0 && jugador[1][2-i][2-j] == 0 && !siguiente) {jugador[turno][2-i][2-j] = 1; siguiente = 1;}
-                        }
-                    }
-                    for (i = 0; i < 2; i++) //Esquinas
-                    {
-                        for (j = 0; j < 2; j++)
-                        {
-                            if (jugador[0][2*i][2*j] == 0 && jugador[1][2*i][2*j] == 0 && !siguiente) {jugador[turno][2*i][2*j] = 1; siguiente = 1;}
-                        }
-                    }
-                    while (!siguiente) //Random
-                    {
-                        i = rand()%3;
-                        j = rand()%3;
-                        if (jugador[0][i][j] == 0 && jugador[1][i][j] == 0) {jugador[turno][i][j] = 1; siguiente = 1;}
-                    }
-                }
-                turno = !turno;
-            } while (!fin);
-            if (fin == esnpc + 1)
-            {
-                printf("\n\nHas ganado!!!");
-                Sleep(500);
-                printf(".");
-                Sleep(500);
-                printf(".");
-                Sleep(500);
-                printf(". ");
-                Sleep(500);
-                printf("No cre%c que eso fuera posible...", 161);
-            }
-            else if (fin == 3)
-            {
-                printf("\n\nEmpate.");
-            }
-            else
-            {
-                printf("\n\nPerdiste...");
-            }
+            jugador = IngresaGato(jugador, turno, 0);
+            turno = !turno;
         }
-        if (select == 2)
-        {
-            do
-            {
-                fin = ChecaFin(jugador);
-                ImprimeGato(jugador);
-                if(!fin)
-                {
-                    jugador = IngresaGato(jugador, turno, 0);
-                    turno = !turno;
-                }
-            } while (!fin);
-            if (fin != 3) printf("\nHa ganado el jugador %d.", fin);
-            else printf("\nEmpate.");
-        }
-    } while (select != 0 && select != 1 && select != 2);
+    } while (!fin);
+    if (fin != 3) printf("\nHa ganado el jugador %d.", fin);
+    else printf("\nEmpate.");
     return 0;
 }
 
