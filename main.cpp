@@ -1,51 +1,49 @@
 #include <stdio.h>
 #include <stdlib.h>
 #ifdef WINDOWS
-    #include <Windows.h>
+#include <Windows.h>
 #else
-    #include <unistd.h> // for usleep
+#include <unistd.h> // for usleep
 
-    void Sleep(int milliseconds){ // cross-platform sleep function
-        if (milliseconds >= 1000)
-            sleep(milliseconds / 1000);
-        usleep((milliseconds % 1000) * 1000);
-    };
+void Sleep(int milliseconds){ // cross-platform sleep function
+    if (milliseconds >= 1000)
+        sleep(milliseconds / 1000);
+    usleep((milliseconds % 1000) * 1000);
+};
 #endif
 
-void ImprimeGato(int*** jugador);
-int*** IngresaGato(int*** jugador, int turno, int solitario);
-int ChecaFin(int*** jugador);
+void ImprimeGato(int** tablero);
+int** IngresaGato(int** tablero, int turno);
+int ChecaFin(int** tablero);
+void titulo();
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////
 class Juego {
 private:
     int fin = 0, turno = 0, i, j;
-    int*** jugador = (int***) malloc(2*sizeof(int**));
+    int** tablero = (int**) malloc(3*sizeof(int*));
 public:
     Juego() {
-        for (i = 0; i < 2; i++)
+        for (i = 0; i < 3; i++)
         {
-            jugador[i] = (int**) malloc(3*sizeof(int*));
-            for (j = 0; j < 3; j++)
-            {
-                jugador[i][j] = (int*) malloc(3*sizeof(int));
-            }
+            tablero[i] = (int*) malloc(3*sizeof(int));
         }
         for (i = 0; i < 3; i++)
         {
             for (j = 0; j < 3; j++)
             {
-                jugador[0][i][j] = 0;
-                jugador[1][i][j] = 0;
+                tablero[i][j] = 0;
             }
         }
     };
     void acompletate() {
         do
         {
-            fin = ChecaFin(jugador);
-            ImprimeGato(jugador);
+            fin = ChecaFin(tablero);
+            ImprimeGato(tablero);
             if(!fin)
             {
-                jugador = IngresaGato(jugador, turno, 0);
+                tablero = IngresaGato(tablero, turno);
                 turno = !turno;
             }
         } while (!fin);
@@ -54,8 +52,8 @@ public:
         return fin;
     }
 };
+////////////////////////////////////////////////////////////////////////////////////////////////
 
-void titulo();
 
 int main()
 {
@@ -65,10 +63,11 @@ int main()
     juego.acompletate();
     int ganador = juego.quienGano();
     // anuncia el ganador
-    if (ganador != 3) printf("\nHa ganado el jugador %d.", ganador);
+    if (ganador != 3) printf("\nHa ganado el tablero %d.", ganador);
     else printf("\nEmpate.");
     return 0;
 }
+
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -85,14 +84,14 @@ void titulo() {
     printf("%c____/   /      %c    |     %c____/\n\n\n", 92, 92, 92);
 }
 
-void ImprimeGato(int*** jugador)
+void ImprimeGato(int** tablero)
 {
     int i, j;
     for(i = 0; i < 15; i++)
     {
         for(j = 0; j < 3; j++)
         {
-            if (jugador[1][i/5][j] == 1)
+            if (tablero[i/5][j] == 1)
             {
                 if ((i + 1) % 5 == 1)
                 {printf("  ___  ");}
@@ -103,7 +102,7 @@ void ImprimeGato(int*** jugador)
                 else if ((i + 1) % 5 == 4)
                 {printf(" %c___/ ", 92);}
             }
-            else if(jugador[0][i/5][j] == 1)
+            else if(tablero[i/5][j] == 2)
             {
                 if ((i + 1) % 5 == 1)
                 {printf("       ");}
@@ -128,19 +127,12 @@ void ImprimeGato(int*** jugador)
     }
 }
 
-int*** IngresaGato(int*** jugador, int turno, int solitario)
+int** IngresaGato(int** tablero, int turno)
 {
     int valor;
     printf("\n\n");
-    if (!solitario)
-    {
-        printf("Turno del jugador %d.\n", turno + 1);
-        printf("Jugador %d, ingresa el n%cmero de acuerdo al siguiente ejemplo:\n\n", turno + 1, 163);
-    }
-    else
-    {
-        printf("Tu turno.\nIngresa el n%cmero de acuerdo al siguiente ejemplo:\n\n", 163);
-    }
+    printf("Turno del tablero %d.\n", turno + 1);
+    printf("tablero %d, ingresa el n%cmero de acuerdo al siguiente ejemplo:\n\n", turno + 1, 163);
     printf("1|2|3\n");
     printf("%c|%c|%c\n", 196, 196, 196);
     printf("4|5|6\n");
@@ -154,36 +146,44 @@ int*** IngresaGato(int*** jugador, int turno, int solitario)
             scanf("%d", &valor);
             if(valor < 1 || 9 < valor) printf("Valor invalido: El numero debe estar entre 1 y 9.\n");
         } while (valor < 1 || 9 < valor);
-        if(jugador[0][(valor-1)/3][(valor-1)%3] || jugador[1][(valor-1)/3][(valor-1)%3]) printf("Valor invalido: Elige un lugar no ocupado.\n");
+        if(tablero[(valor-1)/3][(valor-1)%3]) printf("Valor invalido: Elige un lugar no ocupado.\n");
 
-    } while(jugador[0][(valor-1)/3][(valor-1)%3] || jugador[1][(valor-1)/3][(valor-1)%3]);
-    jugador[turno][(valor-1)/3][(valor-1)%3] = 1;
-    return jugador;
+    } while(tablero[(valor-1)/3][(valor-1)%3]);
+    if (turno == 0)
+    {tablero[(valor-1)/3][(valor-1)%3] = 1;}
+    else {tablero[(valor-1)/3][(valor-1)%3] = 2;}
+    return tablero;
 }
 
-int ChecaFin(int*** jugador)
+int ChecaFin(int** tablero)
 {
     int fin, k, i, j;
-    for(i = 0, fin = 3; i < 3; i++)
+    for(i = 0, fin = 3; i < 3; i++)//Checa si es empate
     {
         for (j = 0; j < 3; j++)
         {
-            if (jugador[0][i][j] == 0 && jugador[1][i][j] == 0) fin = 0;
+            if (!tablero[i][j]) fin = 0;
         }
     }
-    for(k = 0; k < 2; k++)
+
+    for(i = 0; i < 3; i++)
     {
-        for(i = 0; i < 3; i++)
-        {
-            if(jugador[k][i][0]==jugador[k][i][1]&&jugador[k][i][1]==jugador[k][i][2]&&jugador[k][i][0]==1)
-                fin = k + 1;
-            if(jugador[k][0][i]==jugador[k][1][i]&&jugador[k][1][i]==jugador[k][2][i]&&jugador[k][0][i]==1)
-                fin = k + 1;
-        }
-        if(jugador[k][0][0]==jugador[k][1][1]&&jugador[k][1][1]==jugador[k][2][2]&&jugador[k][0][0]==1)
-            fin = k + 1;
-        if(jugador[k][2][0]==jugador[k][1][1]&&jugador[k][1][1]==jugador[k][0][2]&&jugador[k][2][0]==1)
-            fin = k + 1;
+        if(tablero[i][0]==tablero[i][1]&&tablero[i][1]==tablero[i][2]&&tablero[i][0]==1)//Checa horizontal jugador 1
+            fin = 1;
+        if(tablero[i][0]==tablero[i][1]&&tablero[i][1]==tablero[i][2]&&tablero[i][0]==2)//Checa horizontal jugador 2
+            fin = 2;
+        if(tablero[0][i]==tablero[1][i]&&tablero[1][i]==tablero[2][i]&&tablero[0][i]==1)//Checa vertical jugador 1
+            fin = 1;
+        if(tablero[0][i]==tablero[1][i]&&tablero[1][i]==tablero[2][i]&&tablero[0][i]==2)//Checa vertical jugador 2
+            fin = 2;
     }
+    if(tablero[0][0]==tablero[1][1]&&tablero[1][1]==tablero[2][2]&&tablero[0][0]==1)//Checa diagonal (\) jugador 1
+        fin = 1;
+    if(tablero[0][0]==tablero[1][1]&&tablero[1][1]==tablero[2][2]&&tablero[0][0]==2)//Checa diagonal (\) jugador 2
+        fin = 2;
+    if(tablero[2][0]==tablero[1][1]&&tablero[1][1]==tablero[0][2]&&tablero[2][0]==1)//Checa diagonal (/) jugador 1
+        fin = 1;
+    if(tablero[2][0]==tablero[1][1]&&tablero[1][1]==tablero[0][2]&&tablero[2][0]==2)//Checa diagonal (/) jugador 2
+        fin = 2;
     return fin;
 }
